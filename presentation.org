@@ -1,0 +1,127 @@
+#+TITLE: BuildRoot
+#+REVEAL-TRANS: fade
+#+OPTIONS: reveal-control
+#+OPTIONS: toc:nil
+#+REVEAL_THEME: beige
+
+
+* Contenedores
+** Que son?
+   Aplicaciones empaquetadas en entornos aislados.
+** Como funcionan?
+*** Cgroups
+    #+BEGIN_SRC sh
+      mount --type cgroup
+      man 7 cgroups
+    #+END_SRC
+    1. cpu
+    2. cpuacct
+    3. cpuset  - bind to set of CPUs, NUMA nodes
+    4. memory
+    5. devices - creation read/write devices (mknod)
+    6. freezer
+    7. ~net_cls~
+    8. blkio
+    9. etc.
+
+*** Namespaces
+    #+BEGIN_SRC sh
+      unshare
+      man 1 unshare
+    #+END_SRC
+    1. Mount    - filesystem mount points
+    2. UTS      - hostname and domainname
+    3. IPC      - interprocess communication (IPC) resources
+    4. PID      - PID number space
+    5. Network  - network interfaces
+    6. User     - UID/GID number spaces
+    7. Cgroup   - cgroup root directory
+
+*** chroot
+    #+BEGIN_SRC sh
+      chroot
+      man 1 chrooot
+    #+END_SRC
+** Runtimes
+    :PROPERTIES:
+    :reveal_background: ./img/dark_molec.jpg
+    :reveal_background_trans: slide
+    :END:
+ #+REVEAL: split
+
+   #+NAME: lxc
+   #+arrt_html: width 200px
+   [[./img/lxc.png]]
+   + First unprivileged
+   #+REVEAL: split
+
+   #+NAME: docker
+   #+arrt_html: width 200px
+   [[./img/docker.svg]]
+   #+REVEAL: split
+
+   #+NAME: rkt
+   #+arrt_html: width 200px
+   [[./img/rkt.svg]]
+   #+REVEAL: split
+
+   #+NAME: systemd
+   #+arrt_html: width 200px
+   [[./img/systemd.png]]
+
+* Problemas
+** Tamaño
+#+BEGIN_SRC sh
+$ docker images | grep node
+  node           latest 8672b25e842c 2 weeks ago   674MB
+  node_defconfig latest 57b17e145fa8 8 seconds ago 16.5MB
+#+END_SRC
+** Tiempo de creación
+#+BEGIN_SRC sh
+$ cat > Dockerfile << EOF
+  FROM node:latest
+  ADD  path/to/sampletext.js /usr/bin
+  CMD  /usr/bin/node
+  EOF
+$ time docker build .
+  mucho tiempo
+#+END_SRC
+
+#+BEGIN_SRC sh
+$ cat > Dockerfile << EOF
+  FROM node_defconfig:latest
+  ADD  path/to/sampletext.js /usr/bin
+  CMD  /usr/bin/node
+  EOF
+$ time docker build .
+  menos tiempo :)
+#+END_SRC
+* Docker ~FROM scratch~
+  - Minimización
+  - ‎Manejo de dependencias
+** Complejidad
+
+* Buildroot
+** Buildroot y contenedores
+** Alternativas
+    - Open Embedded
+    - BitBake
+    - YoctoProject
+    - Buildroot
+
+** Ventajas
+    - Dependencias
+    - Control granular de opciones
+
+* Comandos
+  - make savedefconfig
+  - make ${target name}
+  - make menuconfig
+  - make clean / distclean
+  - make source
+  - make all
+  - make
+* Demo
+  #+BEGIN_SRC sh
+  git clone https://git.digitales.cslabrecha.org/zentauro/buildroot_starter.git
+  #+END_SRC
